@@ -1,12 +1,11 @@
+import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application, CommandHandler, CallbackQueryHandler,
     MessageHandler, filters, ContextTypes, ConversationHandler
 )
-import asyncio
 
-# ====================== CONFIGURAÇÃO ======================
-TOKEN = "8517238996:AAFN-7HxxJ0opRQdlfUpS-nWpNTwaIjzf4U"   # ← Coloque seu token aqui de novo
+TOKEN = "8517238996:AAFN-7HxxJ0opRQdlfUpS-nWpNTwaIjzf4U"  # ← Coloque seu token aqui
 
 WAITING_PHOTO = 1
 
@@ -129,18 +128,14 @@ async def receive_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     style = context.user_data.get("style", "desconhecido")
     await update.message.reply_text(f"⏳ Gerando com o estilo: `{style}`\nAguarde...")
-
-    await update.message.reply_text(
-        f"✅ Foto recebida!\nEstilo: `{style}`\n\n"
-        "Aqui depois vai aparecer o resultado da API."
-    )
+    await update.message.reply_text(f"✅ Foto recebida!\nEstilo: `{style}`")
     return ConversationHandler.END
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Cancelado.")
     return ConversationHandler.END
 
-def main():
+async def main():
     app = Application.builder().token(TOKEN).build()
 
     conv_handler = ConversationHandler(
@@ -156,8 +151,11 @@ def main():
     app.add_handler(conv_handler)
     app.add_handler(CallbackQueryHandler(button_handler))
 
-    print("Bot iniciado com sucesso!")
-    app.run_polling(drop_pending_updates=True)
+    print("Bot iniciado!")
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling(drop_pending_updates=True)
+    await asyncio.Event().wait()  # Mantém o bot rodando
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
