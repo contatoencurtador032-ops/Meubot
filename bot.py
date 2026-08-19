@@ -3,14 +3,12 @@ from telegram.ext import (
     Application, CommandHandler, CallbackQueryHandler,
     MessageHandler, filters, ContextTypes, ConversationHandler
 )
+import asyncio
 
 # ====================== CONFIGURAÇÃO ======================
-TOKEN = "8517238996:AAFN-7HxxJ0opRQdlfUpS-nWpNTwaIjzf4U"   # ← Coloque o token do BotFather aqui
+TOKEN = "8517238996:AAFN-7HxxJ0opRQdlfUpS-nWpNTwaIjzf4U"   # ← Coloque seu token aqui de novo
 
-# Estados
 WAITING_PHOTO = 1
-
-# ====================== MENUS ======================
 
 def main_menu():
     keyboard = [
@@ -26,7 +24,6 @@ def main_menu():
     ]
     return InlineKeyboardMarkup(keyboard)
 
-
 def sexy_menu():
     keyboard = [
         [InlineKeyboardButton("👙 Bikini", callback_data="style_bikini"),
@@ -34,7 +31,6 @@ def sexy_menu():
         [InlineKeyboardButton("⬅️ Voltar", callback_data="back_main")]
     ]
     return InlineKeyboardMarkup(keyboard)
-
 
 def nudes_menu():
     keyboard = [
@@ -48,7 +44,6 @@ def nudes_menu():
     ]
     return InlineKeyboardMarkup(keyboard)
 
-
 def sex_scenes_menu():
     keyboard = [
         [InlineKeyboardButton("💋 Kissing", callback_data="style_kissing"),
@@ -60,7 +55,6 @@ def sex_scenes_menu():
     ]
     return InlineKeyboardMarkup(keyboard)
 
-
 def kinks_menu():
     keyboard = [
         [InlineKeyboardButton("Feet Up", callback_data="style_feet"),
@@ -70,7 +64,6 @@ def kinks_menu():
         [InlineKeyboardButton("⬅️ Voltar", callback_data="back_main")]
     ]
     return InlineKeyboardMarkup(keyboard)
-
 
 def handjobs_menu():
     keyboard = [
@@ -84,16 +77,12 @@ def handjobs_menu():
     ]
     return InlineKeyboardMarkup(keyboard)
 
-
-# ====================== HANDLERS ======================
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🔥 *OpenGoon Bot*\n\nEscolha uma opção:",
         reply_markup=main_menu(),
         parse_mode="Markdown"
     )
-
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -109,7 +98,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return ConversationHandler.END
 
     if data == "credits":
-        await query.edit_message_text("💎 Você ainda não tem sistema de créditos configurado.")
+        await query.edit_message_text("💎 Sistema de créditos ainda não configurado.")
         return ConversationHandler.END
 
     if data in ["cat_video", "cat_xray", "cat_nude"]:
@@ -133,34 +122,23 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("📸 Envie a foto agora:")
         return WAITING_PHOTO
 
-
 async def receive_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message.photo:
-        await update.message.reply_text("Por favor, envie uma *foto*.")
+        await update.message.reply_text("Por favor, envie uma foto.")
         return WAITING_PHOTO
 
-    photo = update.message.photo[-1]
-    file = await photo.get_file()
     style = context.user_data.get("style", "desconhecido")
-
     await update.message.reply_text(f"⏳ Gerando com o estilo: `{style}`\nAguarde...")
 
-    # =====================================================
-    # AQUI ENTRA A SUA API PRONTA
-    # =====================================================
-
     await update.message.reply_text(
-        f"✅ Foto recebida!\nEstilo escolhido: `{style}`\n\n"
-        "Aqui depois vai aparecer a imagem/vídeo gerado pela API."
+        f"✅ Foto recebida!\nEstilo: `{style}`\n\n"
+        "Aqui depois vai aparecer o resultado da API."
     )
-
     return ConversationHandler.END
-
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Operação cancelada.")
+    await update.message.reply_text("Cancelado.")
     return ConversationHandler.END
-
 
 def main():
     app = Application.builder().token(TOKEN).build()
@@ -178,9 +156,8 @@ def main():
     app.add_handler(conv_handler)
     app.add_handler(CallbackQueryHandler(button_handler))
 
-    print("Bot iniciado...")
-    app.run_polling()
-
+    print("Bot iniciado com sucesso!")
+    app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
     main()
